@@ -1,0 +1,21 @@
+# 数据备份（仅本地留存，不进仓库）
+data/policies.backup-*.json
+data/*.backup.json
+
+# 抓取中间产物（体积大、可重新生成）
+data/_all_items.json
+data/_candidates.json
+data/_index_batch4.json
+data/_batch3b_candidates.json
+data/_ids.txt
+
+# 本机临时目录与工作区元数据
+_tmp_ingest/
+.workbuddy/
+_*.txt
+
+# 系统文件
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

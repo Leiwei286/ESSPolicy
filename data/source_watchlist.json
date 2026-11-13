@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "note": "固定信息源清单。verified=false 的条目尚未逐一点开校验栏目路径，首次周更时校验并改为 true。",
+  "sources": [
+    {
+      "name": "北极星储能网-政策频道",
+      "type": "聚合源",
+      "url": "https://chuneng.bjx.com.cn/zc/1",
+      "frequency": "每周",
+      "verified": true,
+      "note": "主抓取源。单页约64条、周均13条；翻页格式 /zc/N"
+    },
+    {
+      "name": "国家发展和改革委员会-价格政策/能源",
+      "type": "国家",
+      "url": "https://www.ndrc.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "容量电价、现货规则、分时电价的国家级源头"
+    },
+    {
+      "name": "国家能源局-政策法规",
+      "type": "国家",
+      "url": "https://www.nea.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "配储要求、并网调度、新型储能专项行动方案"
+    },
+    {
+      "name": "内蒙古自治区能源局",
+      "type": "重点省",
+      "url": "https://nyj.nmg.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "独立储能清单按批次印发，第四批已于2026-09下发"
+    },
+    {
+      "name": "新疆维吾尔自治区发展和改革委员会",
+      "type": "重点省",
+      "url": "https://xjdrc.xinjiang.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "容量电价、新能源配置、独立储能优选"
+    },
+    {
+      "name": "河北省发展和改革委员会",
+      "type": "重点省",
+      "url": "https://hbdrc.hebei.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "独立储能申报、整治清单、共用工程分摊"
+    },
+    {
+      "name": "广东省发展和改革委员会",
+      "type": "重点省",
+      "url": "https://drc.gd.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "现货规则以南方区域为主，需同时跟踪南网总调"
+    },
+    {
+      "name": "宁夏回族自治区发展和改革委员会",
+      "type": "重点省",
+      "url": "https://fzggw.nx.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "储能清单调整频繁，需逐批跟踪调入调出"
+    },
+    {
+      "name": "青海省发展和改革委员会",
+      "type": "重点省",
+      "url": "https://fgw.qinghai.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "调频辅助服务细则由西北能监局发布，需并轨跟踪"
+    },
+    {
+      "name": "甘肃省发展和改革委员会",
+      "type": "重点省",
+      "url": "https://fzgg.gansu.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "本批样品未覆盖甘肃省级核心政策，下批补齐"
+    },
+    {
+      "name": "江苏省发展和改革委员会",
+      "type": "重点省",
+      "url": "https://fzggw.jiangsu.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "容量租赁政策过渡期至2027-01-31，需紧盯接续文件"
+    },
+    {
+      "name": "浙江省发展和改革委员会（能源局）",
+      "type": "重点省",
+      "url": "https://fzggw.zj.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "年度建设计划、入市名单、容量电费挂钩规则"
+    },
+    {
+      "name": "国家能源局西北监管局",
+      "type": "区域监管",
+      "url": "https://xbj.nea.gov.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "宁夏/青海/甘肃/新疆调频辅助服务细则的实际发布方"
+    },
+    {
+      "name": "中国南方电力调度控制中心",
+      "type": "区域调度",
+      "url": "https://www.csg.cn/",
+      "frequency": "每周",
+      "verified": false,
+      "note": "南方区域储能参与市场方案、调频规则"
+    },
+    {
+      "name": "ima 知识库-储能政策手动收集",
+      "type": "手动收集源",
+      "channel": "ima",
+      "url": "ima://ima_kb_iHYocgRz/folder_7526813123233295",
+      "path": "太和致远实习/储能/储能政策汇总/储能政策手动收集",
+      "knowledge_base_id": "ima_kb_iHYocgRz",
+      "folder_id": "folder_7526813123233295",
+      "parent_folder_id": "folder_7452182106344356",
+      "frequency": "每周（随周更一并读取）",
+      "verified": true,
+      "note": "用户手工收集，是补充源不是主源。路径校验于 2026-11-13。入库走 tools/ingest_manual.py，必须先去重：与北极星抓取内容高度重叠，且同一指标可能出现两个数值（青海 165/185、四川 350/400 均由此类重叠引发），冲突只报告不自动选值。子文件夹「储能项目清单」(folder_7526813303590056) 已于 2026-11-13 放入 17 篇公众号文章，入库 16 条、合并 1 条；主文件夹下其他子文件夹仍为空。"
+    },
+    {
+      "name": "微信公众号-储能与电力市场",
+      "type": "行业媒体源",
+      "channel": "wx_espm",
+      "url": "https://mp.weixin.qq.com/",
+      "account_name": "储能与电力市场",
+      "frequency": "每周（随周更一并检索）",
+      "verified": true,
+      "access": [
+        "微信无公开的历史文章列表接口，也没有可用的公众号连接器，不能像北极星那样脚本翻页",
+        "路径一：WebSearch 检索词带上「储能与电力市场」，该号文章被网易、新浪财经、东方财富等大量转载，正文可直接抓取（2026-11-13 实测可行）",
+        "路径二：拿到 mp.weixin.qq.com 具体文章链接时可直接抓正文，但链接需从检索结果或用户提供",
+        "路径三：用户在微信里看到有价值的文章，转存到 ima「储能政策手动收集」文件夹，走 ima 通道"
+      ],
+      "note": "定位是线索源与口径旁证，不是政策原文源。该号以政策解读、市场机制分析、项目盘点为主，常见「某省细则落地／某清单印发」的快速解读，用于发现北极星未收录的文件；但解读不等于原文，入库判定仍以官方文件或北极星转载全文为准。仅当文章披露了官方未公开的量化信息（清单规模、细则参数、补偿标准）且能定位到原始文件时，才据此建条目并在 note 注明「据公众号解读整理，原文待补」。渠道标记 channel=wx_espm。"
+    }
+  ]
+}

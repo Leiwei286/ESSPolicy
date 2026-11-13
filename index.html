@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>储能政策跟踪看板</title>
+<style>
+:root{
+  --bg:#FAFAF7;
+  --panel:#FFFFFF;
+  --ink:#1C1C1A;
+  --ink2:#57564F;
+  --ink3:#8C8A80;
+  --line:#E5E3DB;
+  --line2:#D3D0C5;
+  --gold:#A8842C;
+  --gold-bg:#FAF3E2;
+  --bull:#B3352B;
+  --bull-bg:#FBEBE9;
+  --bear:#1D7E5A;
+  --bear-bg:#E7F4EF;
+  --flat:#6B6A62;
+  --flat-bg:#F0EFEA;
+  --blue:#2F5C8A;
+  --blue-bg:#EAF1F7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);
+  font-size:13px;line-height:1.6;
+  padding:0 0 60px;
+}
+.wrap{max-width:1560px;margin:0 auto;padding:0 28px}
+
+/* ---------- header ---------- */
+header{padding:26px 0 16px;border-bottom:1px solid var(--line)}
+.hd-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+h1{font-size:20px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+h1::before{content:"";width:3px;height:18px;background:var(--gold);display:inline-block;border-radius:2px}
+.sub{color:var(--ink3);font-size:12px;margin-top:6px;letter-spacing:.2px}
+.hd-meta{text-align:right;font-size:12px;color:var(--ink2);line-height:1.9}
+.hd-meta b{font-weight:600;color:var(--ink)}
+.phase{display:inline-block;font-size:11px;color:var(--gold);background:var(--gold-bg);
+  border:1px solid #EBDCB4;border-radius:3px;padding:1px 7px;margin-left:10px;letter-spacing:.3px}
+
+/* ---------- metrics ---------- */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+  border-bottom:1px solid var(--line)}
+.metric{background:var(--bg);padding:14px 4px 14px 0}
+.metric .lb{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.metric .vl{font-size:26px;font-weight:600;line-height:1.25;font-variant-numeric:tabular-nums}
+.metric .vl small{font-size:11px;font-weight:400;color:var(--ink3);margin-left:3px}
+.metric.hl .vl{color:var(--gold)}
+
+/* ---------- filters ---------- */
+.filters{padding:14px 0 6px;border-bottom:1px solid var(--line)}
+.frow{display:flex;align-items:flex-start;gap:10px;padding:4px 0}
+.flab{flex:none;width:56px;font-size:11px;color:var(--ink3);letter-spacing:.5px;padding-top:5px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;padding:3px 10px;border:1px solid var(--line2);border-radius:3px;
+  background:var(--panel);color:var(--ink2);cursor:pointer;user-select:none;transition:.12s;white-space:nowrap}
+.chip:hover{border-color:var(--ink3);color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on.gold{background:var(--gold);border-color:var(--gold);color:#fff}
+.chip .n{opacity:.55;margin-left:4px;font-size:11px}
+.frow2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0 4px;margin-top:4px;
+  border-top:1px dashed var(--line)}
+select,input[type=text],input[type=date]{font-family:inherit;font-size:12px;color:var(--ink);
+  border:1px solid var(--line2);border-radius:3px;padding:4px 8px;background:var(--panel);outline:none}
+select:focus,input:focus{border-color:var(--gold)}
+input[type=text]{min-width:230px}
+input[type=text]::placeholder{color:#B5B3A9}
+.sel-lab{font-size:11px;color:var(--ink3);margin-left:6px}
+.spacer{flex:1}
+.btn{font-family:inherit;font-size:12px;padding:4px 12px;border:1px solid var(--line2);
+  border-radius:3px;background:var(--panel);color:var(--ink2);cursor:pointer}
+.btn:hover{border-color:var(--ink3);color:var(--ink)}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;align-items:center;gap:14px;padding:14px 0 10px;flex-wrap:wrap}
+.hit{font-size:12px;color:var(--ink2)}
+.hit b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.views{display:flex;border:1px solid var(--line2);border-radius:3px;overflow:hidden;background:var(--panel)}
+.views button{font-family:inherit;font-size:12px;padding:4px 14px;border:none;background:transparent;
+  color:var(--ink2);cursor:pointer;border-right:1px solid var(--line)}
+.views button:last-child{border-right:none}
+.views button.on{background:var(--ink);color:#fff}
+
+/* ---------- cards ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+  padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:.12s;position:relative}
+.card:hover{border-color:var(--line2);box-shadow:0 1px 6px rgba(0,0,0,.045)}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;border-radius:4px 0 0 4px}
+.card[data-impact="利多"]::before{background:var(--bull)}
+.card[data-impact="利空"]::before{background:var(--bear)}
+.card[data-impact="中性"]::before{background:var(--flat)}
+.c-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.c-title{font-size:14px;font-weight:600;line-height:1.5;letter-spacing:.2px}
+.c-date{flex:none;font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tag{font-size:11px;padding:1px 7px;border-radius:2px;line-height:1.7;letter-spacing:.2px}
+.t-region{background:var(--blue-bg);color:var(--blue)}
+.t-cat{background:#EFEDF6;color:#4E4482}
+.t-level{background:var(--flat-bg);color:var(--flat)}
+.t-bull{background:var(--bull-bg);color:var(--bull)}
+.t-bear{background:var(--bear-bg);color:var(--bear)}
+.t-flat{background:var(--flat-bg);color:var(--flat)}
+.t-star{background:var(--gold-bg);color:var(--gold)}
+.t-flag{background:#FDF0E4;color:#A25E1E}
+.t-flag2{background:#EAF1F7;color:var(--blue)}
+.t-sup{background:#F3EFF6;color:#6B4C7A}
+.c-sum{margin-top:9px;font-size:13px;color:var(--ink);font-weight:500}
+.c-points{margin-top:7px;padding-left:0;list-style:none}
+.c-points li{position:relative;padding-left:14px;color:var(--ink2);font-size:12.5px;line-height:1.75}
+.c-points li::before{content:"—";position:absolute;left:0;color:var(--ink3)}
+.c-metrics{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.mchip{font-size:11px;padding:2px 7px;border:1px solid #D8E3EC;border-radius:2px;color:var(--blue);
+  background:#F7FAFC;font-variant-numeric:tabular-nums}
+.mchip.flag{border-color:#EBD3B4;color:#A25E1E;background:#FDF7EF}
+.no-data{padding:60px 0;text-align:center;color:var(--ink3);font-size:13px}
+.idx-hint{margin-bottom:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:4px;
+  font-size:11.5px;color:var(--ink3);line-height:1.7;background:transparent}
+.idx-hint b{color:var(--gold);font-variant-numeric:tabular-nums}
+.idx-hint a{margin-left:6px;color:var(--gold);text-decoration:none;border-bottom:1px solid currentColor}
+.card.idx{opacity:.86}
+.card.idx .c-title{font-weight:500}
+.card.idx:hover{opacity:1}
+
+/* ---------- matrix ---------- */
+.mx-wrap{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px;overflow:auto}
+table.mx{border-collapse:separate;border-spacing:3px;width:100%;font-variant-numeric:tabular-nums}
+table.mx th{font-size:11px;font-weight:500;color:var(--ink3);padding:4px 2px;text-align:center;
+  letter-spacing:.2px;white-space:nowrap}
+table.mx th.rh{text-align:left;padding-left:6px;width:82px;color:var(--ink2);font-size:12px}
+table.mx td{text-align:center;font-size:12px;padding:7px 0;border-radius:2px;color:var(--ink2);cursor:pointer}
+table.mx td.z{background:#FAFAF7;color:#D8D6CC;cursor:default}
+table.mx td:hover:not(.z){outline:1px solid var(--ink3)}
+.mx-note{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink3)}
+
+/* ---------- timeline ---------- */
+.tl-month{margin-bottom:22px}
+.tl-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.tl-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none}
+.tl-m{font-size:13px;font-weight:600;letter-spacing:.6px}
+.tl-n{font-size:11px;color:var(--ink3)}
+.tl-bar{flex:1;height:5px;background:#EFEEE8;border-radius:3px;overflow:hidden;display:flex;max-width:420px}
+.tl-bar i{display:block;height:100%}
+.tl-items{border-left:1px solid var(--line);padding-left:16px;margin-left:3px}
+.tl-row{display:flex;gap:12px;padding:5px 0;font-size:12.5px;cursor:pointer;align-items:baseline}
+.tl-row:hover .tl-t{color:var(--gold)}
+.tl-d{flex:none;color:var(--ink3);font-size:11.5px;width:44px;font-variant-numeric:tabular-nums}
+.tl-t{color:var(--ink);line-height:1.5}
+
+/* ---------- drawer ---------- */
+.mask{position:fixed;inset:0;background:rgba(28,28,26,.28);opacity:0;pointer-events:none;
+  transition:.18s;z-index:40}
+.mask.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:640px;max-width:94vw;background:var(--panel);
+  border-left:1px solid var(--line2);z-index:41;transform:translateX(100%);transition:.22s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;padding:28px 32px 60px}
+.drawer.on{transform:translateX(0)}
+.d-close{position:absolute;top:18px;right:22px;font-size:20px;line-height:1;color:var(--ink3);
+  cursor:pointer;border:none;background:none;padding:4px}
+.d-close:hover{color:var(--ink)}
+.d-title{font-size:17px;font-weight:600;line-height:1.55;padding-right:30px;letter-spacing:.2px}
+.d-sec{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.d-sec h4{font-size:11px;font-weight:500;color:var(--ink3);letter-spacing:1.2px;margin-bottom:10px}
+.kv{display:grid;grid-template-columns:76px 1fr;gap:5px 12px;font-size:12.5px}
+.kv dt{color:var(--ink3)}
+.kv dd{color:var(--ink);word-break:break-all}
+.d-points{list-style:none;counter-reset:p}
+.d-points li{position:relative;padding:6px 0 6px 26px;font-size:12.5px;line-height:1.75;
+  border-bottom:1px dashed var(--line);counter-increment:p}
+.d-points li:last-child{border-bottom:none}
+.d-points li::before{content:counter(p);position:absolute;left:0;top:7px;width:16px;height:16px;
+  border-radius:2px;background:var(--gold-bg);color:var(--gold);font-size:10px;text-align:center;line-height:16px}
+table.mt{width:100%;border-collapse:collapse;font-size:12px}
+table.mt td{padding:6px 8px;border-bottom:1px solid var(--line)}
+table.mt td:first-child{color:var(--ink3);width:150px}
+table.mt td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.logic{background:#FAFAF7;border-left:2px solid var(--gold);padding:10px 14px;font-size:12.5px;line-height:1.8;color:var(--ink2)}
+.link{display:inline-block;font-size:12px;color:var(--blue);text-decoration:none;border-bottom:1px dotted var(--blue);margin-right:16px}
+.link:hover{color:var(--gold);border-color:var(--gold)}
+.d-note{font-size:11.5px;color:var(--ink3);line-height:1.8;background:#FAFAF7;border-radius:3px;padding:10px 12px}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink3);line-height:2}
+@media(max-width:900px){
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .wrap{padding:0 16px}
+  .flab{width:44px}
+  .drawer{padding:24px 20px 50px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hd-row">
+      <div>
+        <h1>储能政策跟踪看板<span class="phase" id="phase"></span></h1>
+        <div class="sub" id="coverage"></div>
+      </div>
+      <div class="hd-meta" id="hdmeta"></div>
+    </div>
+  </header>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="filters">
+    <div class="frow">
+      <div class="flab">地区</div>
+      <div class="chips" id="f-region"></div>
+    </div>
+    <div class="frow">
+      <div class="flab">分类</div>
+      <div class="chips" id="f-cat"></div>
+    </div>
+    <div class="frow2">
+      <span class="sel-lab">层级</span>
+      <div class="chips" id="f-level"></div>
+      <span class="sel-lab">影响</span>
+      <div class="chips" id="f-impact"></div>
+      <span class="sel-lab">状态</span>
+      <div class="chips" id="f-status"></div>
+    </div>
+    <div class="frow2" style="border-top:none;padding-top:2px">
+      <span class="sel-lab" style="margin-left:0">星级</span>
+      <select id="f-star">
+        <option value="0">全部</option>
+        <option value="3">★★★</option>
+        <option value="2">★★ 及以上</option>
+        <option value="1">★ 及以上</option>
+      </select>
+      <span class="sel-lab">发文日期</span>
+      <input type="date" id="f-from">
+      <span style="color:var(--ink3);font-size:12px">至</span>
+      <input type="date" id="f-to">
+      <input type="text" id="f-q" placeholder="搜索政策名称 / 发文单位 / 要点关键词 / 指标">
+      <button class="btn" id="btn-reset">重置</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="hit" id="hit"></div>
+    <div class="spacer"></div>
+    <span class="sel-lab">排序</span>
+    <select id="sort">
+      <option value="date">发文日期 ↓</option>
+      <option value="effective">生效日期 ↓</option>
+      <option value="star">星级 ↓</option>
+      <option value="region">地区</option>
+    </select>
+    <div class="views">
+      <button data-view="list" class="on">列表</button>
+      <button data-view="matrix">矩阵</button>
+      <button data-view="timeline">时间轴</button>
+    </div>
+  </div>
+
+  <div id="view-list"></div>
+  <div id="view-matrix" style="display:none"></div>
+  <div id="view-timeline" style="display:none"></div>
+
+  <footer>
+    数据来源：北极星储能网政策频道 + 各发文单位官方页面（原始链接逐条回溯）。<br>
+    看板为研究辅助工具，政策原文以官方发布为准；标注「待核实」的字段表示原文未明确披露，未作推断。<br>
+    更新机制：每周抓取增量 → 输出变更清单 → 确认后写入 data/policies.json → 运行 tools/build_data.py。
+  </footer>
+</div>
+
+<div class="mask" id="mask"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<script src="data/data-bundle.js"></script>
+<script>
+(function(){
+  var DATA = (window.POLICY_DATA && window.POLICY_DATA.policies) || [];
+  var META = window.POLICY_META || {};
+
+  var REGION_ORDER = ["全国","北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海",
+    "江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南",
+    "重庆","四川","贵州","云南","西藏","陕西","甘肃","青海","宁夏","新疆"];
+
+  var CATS = META.categories || ["储能装机目标","储能项目清单","容量电价政策","电力现货规则",
+    "峰谷电价政策","系统运行费规则","辅助服务市场规则","新能源配储要求","储能补贴政策","并网与调度规则"];
+  var KEY = META.key_regions || ["内蒙古","新疆","河北","广东","宁夏","青海","甘肃","江苏","浙江"];
+  var LEVELS = ["国家","省级","市级"];
+  var IMPACTS = ["利多","利空","中性"];
+  var STATUSES = ["现行有效","征求意见","已废止","被替代","已失效","历史索引"];
+
+  var state = {
+    regions: [], cats: [], levels: [], impacts: [],
+    statuses: ["现行有效","征求意见"],
+    minStar: 0, q: "", sort: "date", view: "list", from: "", to: ""
+  };
+
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function regionRank(r){ var i = REGION_ORDER.indexOf(r); return i<0?99:i; }
+
+  /* ---------- header ---------- */
+  $("phase").textContent = META.phase || "";
+  $("coverage").textContent = "全国 + 31 省 · " + CATS.length + " 类政策 · 覆盖 "
+    + (META.coverage_start||"—") + " 至 " + (META.coverage_end||"—")
+    + " · 重点跟踪 " + KEY.length + " 省（" + KEY.slice(0,4).join("、") + " 等）";
+  (function(){
+    var full = DATA.filter(function(d){return d.tier!=="index";}).length;
+    var idx = DATA.length - full;
+    $("hdmeta").innerHTML = "最后更新 <b>" + esc(META.last_update||"—") + "</b><br>"
+      + '<span style="color:#8C8A80">全字段 ' + full + " 条 · 历史索引 " + idx + " 条</span>";
+  })();
+
+  /* ---------- metrics ---------- */
+  function renderMetrics(){
+    var full = DATA.filter(function(d){return d.tier!=="index";}).length;
+    var idx  = DATA.filter(function(d){return d.tier==="index";}).length;
+    var valid = DATA.filter(function(d){return d.status==="现行有效";}).length;
+    var model = DATA.filter(function(d){return d.model_flag && d.model_flag!=="无" && d.tier!=="index";}).length;
+    var s3 = DATA.filter(function(d){return d.star===3;}).length;
+    var cells = [
+      ["全字段", full, "条", "/ 共 " + DATA.length],
+      ["历史索引", idx, "条", "2025 前"],
+      ["现行有效", valid, "条", ""],
+      ["三星期", s3, "条", ""],
+      ["需改测算假设", model, "条", ""]
+    ];
+    $("metrics").innerHTML = cells.map(function(c,i){
+      return '<div class="metric'+(i===4?' hl':'')+'"><div class="lb">'+c[0]+'</div><div class="vl">'
+        + c[1] + (c[2]?'<small>'+c[2]+'</small>':'') + '</div>'
+        + (c[3]?'<div class="lb" style="margin-top:2px">'+c[3]+'</div>':'') + '</div>';
+    }).join("");
+  }
+
+  /* ---------- filter chips ---------- */
+  function buildChips(el, items, getOn, onToggle, counts){
+    el.innerHTML = "";
+    items.forEach(function(it){
+      var value = it.value, label = it.label;
+      var b = document.createElement("button");
+      var on = getOn(value);
+      b.className = "chip" + (on ? " on" : "");
+      b.innerHTML = esc(label) + (counts && counts[value] ? '<span class="n">'+counts[value]+'</span>' : "");
+      b.onclick = function(){
+        onToggle(value);
+        buildFilters();   // 重建筛选条，刷新 .on 高亮状态
+        render();
+      };
+      el.appendChild(b);
+    });
+  }
+
+  function regionCounts(){
+    var m = {};
+    DATA.forEach(function(d){ m[d.region] = (m[d.region]||0)+1; });
+    return m;
+  }
+  function catCounts(){
+    var m = {};
+    DATA.forEach(function(d){ m[d.category] = (m[d.category]||0)+1; });
+    return m;
+  }
+
+  function buildFilters(){
+    var regions = DATA.map(function(d){return d.region;})
+      .filter(function(v,i,a){return a.indexOf(v)===i;})
+      .sort(function(a,b){ return regionRank(a)-regionRank(b); });
+    var rItems = [{value:"__all",label:"全部"}].concat(regions.map(function(r){return {value:r,label:r};}));
+    buildChips($("f-region"), rItems,
+      function(v){ return v==="__all" ? state.regions.length===0 : state.regions.indexOf(v)>=0; },
+      function(v){
+        if(v==="__all"){ state.regions=[]; return; }
+        var i = state.regions.indexOf(v);
+        if(i>=0) state.regions.splice(i,1); else state.regions.push(v);
+      }, regionCounts());
+
+    var cItems = [{value:"__all",label:"全部"}].concat(CATS.map(function(c){return {value:c,label:c};}));
+    buildChips($("f-cat"), cItems,
+      function(v){ return v==="__all" ? state.cats.length===0 : state.cats.indexOf(v)>=0; },
+      function(v){
+        if(v==="__all"){ state.cats=[]; return; }
+        var i = state.cats.indexOf(v);
+        if(i>=0) state.cats.splice(i,1); else state.cats.push(v);
+      }, catCounts());
+
+    buildChips($("f-level"), [{value:"__all",label:"全部"}].concat(LEVELS.map(function(l){return {value:l,label:l};})),
+      function(v){ return v==="__all" ? state.levels.length===0 : state.levels.indexOf(v)>=0; },
+      function(v){
+        if(v==="__all"){ state.levels=[]; return; }
+        var i = state.levels.indexOf(v);
+        if(i>=0) state.levels.splice(i,1); else state.levels.push(v);
+      });
+
+    buildChips($("f-impact"), [{value:"__all",label:"全部"}].concat(IMPACTS.map(function(l){return {value:l,label:l};})),
+      function(v){ return v==="__all" ? state.impacts.length===0 : state.impacts.indexOf(v)>=0; },
+      function(v){
+        if(v==="__all"){ state.impacts=[]; return; }
+        var i = state.impacts.indexOf(v);
+        if(i>=0) state.impacts.splice(i,1); else state.impacts.push(v);
+      });
+
+    buildChips($("f-status"), STATUSES.map(function(s){return {value:s,label:s};}),
+      function(v){ return state.statuses.indexOf(v)>=0; },
+      function(v){
+        var i = state.statuses.indexOf(v);
+        if(i>=0) state.statuses.splice(i,1); else state.statuses.push(v);
+      });
+  }
+
+  /* ---------- filtering ---------- */
+  function match(d){
+    if(state.regions.length && state.regions.indexOf(d.region)<0) return false;
+    if(state.cats.length && state.cats.indexOf(d.category)<0) return false;
+    if(state.levels.length && state.levels.indexOf(d.level)<0) return false;
+    if(state.impacts.length && state.impacts.indexOf(d.impact)<0) return false;
+    if(state.statuses.length && state.statuses.indexOf(d.status)<0) return false;
+    if(state.minStar && (d.star||0) < state.minStar) return false;
+    if(state.from && d.publish_date < state.from) return false;
+    if(state.to && d.publish_date > state.to) return false;
+    if(state.q){
+      var q = state.q.toLowerCase();
+      var hay = [d.title,d.issuer,d.summary,d.logic,d.region,d.category,
+        (d.sub_tags||[]).join(" "),
+        (d.key_points||[]).join(" "),
+        (d.metrics&&d.metrics.note)||""].join(" ").toLowerCase();
+      if(hay.indexOf(q)<0) return false;
+    }
+    return true;
+  }
+
+  function sortIt(arr){
+    var s = state.sort;
+    return arr.slice().sort(function(a,b){
+      if(s==="star"){
+        if(b.star!==a.star) return (b.star||0)-(a.star||0);
+        return a.publish_date < b.publish_date ? 1 : -1;
+      }
+      if(s==="effective"){
+        var ea = a.effective_date && a.effective_date.indexOf("-")>0 ? a.effective_date : "0000-00-00";
+        var eb = b.effective_date && b.effective_date.indexOf("-")>0 ? b.effective_date : "0000-00-00";
+        if(ea!==eb) return ea<eb?1:-1;
+        return a.publish_date<b.publish_date?1:-1;
+      }
+      if(s==="region"){
+        var ra = regionRank(a.region), rb = regionRank(b.region);
+        if(ra!==rb) return ra-rb;
+        return a.publish_date<b.publish_date?1:-1;
+      }
+      if(a.publish_date!==b.publish_date) return a.publish_date<b.publish_date?1:-1;
+      if((b.star||0)!==(a.star||0)) return (b.star||0)-(a.star||0);
+      var lv = { "国家":0,"省级":1,"市级":2 };
+      return (lv[a.level]||9)-(lv[b.level]||9);
+    });
+  }
+
+  /* ---------- render list ---------- */
+  function starStr(n){ return new Array((n||0)+1).join("★"); }
+
+  function cardHtml(d){
+    var impCls = d.impact==="利多"?"t-bull":(d.impact==="利空"?"t-bear":"t-flat");
+    var ms = d.metrics || {};
+    var mchips = [];
+    var units = {
+      cap_price:["容量补偿","元/kW·年"],
+      pv_spread:["峰谷/现货价差","元/kWh"],
+      storage_ratio:["配储比例","%"],
+      duration_h:["时长","h"],
+      dispatch:["年调用","次/日"],
+      scale_gw:["规模","GW"],
+      scale_gwh:["规模","GWh"],
+      ancillary:["辅助服务补偿","元/MW"]
+    };
+    Object.keys(units).forEach(function(k){
+      if(ms[k]!==null && ms[k]!==undefined && ms[k]!==""){
+        mchips.push('<span class="mchip">'+units[k][0]+" "+ms[k]+" "+units[k][1]+"</span>");
+      }
+    });
+    if(d.model_flag && d.model_flag!=="无"){
+      mchips.push('<span class="mchip flag">改'+esc(d.model_flag)+'假设</span>');
+    }
+    var pts = (d.key_points||[]).slice(0,3).map(function(p){ return "<li>"+esc(p)+"</li>"; }).join("");
+    var more = (d.key_points||[]).length>3 ? '<li style="color:#8C8A80">…另有 ' + ((d.key_points.length)-3) + " 条要点，点击查看</li>" : "";
+
+    return '<div class="card'+(d.tier==="index"?' idx':'')+'" data-id="'+esc(d.id)+'" data-impact="'+esc(d.impact)+'">'
+      + '<div class="c-top"><div class="c-title">'+esc(d.title)+'</div>'
+      + '<div class="c-date">'+esc(d.publish_date)+'</div></div>'
+      + '<div class="tags">'
+      + '<span class="tag t-region">'+esc(d.region)+'</span>'
+      + '<span class="tag t-cat">'+esc(d.category)+'</span>'
+      + '<span class="tag t-level">'+esc(d.level)+'</span>'
+      + '<span class="tag '+impCls+'">'+esc(d.impact)+'</span>'
+      + '<span class="tag t-star">'+starStr(d.star)+'</span>'
+      + (d.status!=="现行有效" ? '<span class="tag t-flag2">'+esc(d.status)+'</span>' : '')
+      + (d.tier==="index" ? '<span class="tag t-sup">索引级</span>' : '')
+      + (d.superseded_by ? '<span class="tag t-sup">含替代关系</span>' : '')
+      + '</div>'
+      + '<div class="c-sum">'+esc(d.summary)+'</div>'
+      + (d.tier==="index" ? '' : '<ul class="c-points">'+pts+more+'</ul>')
+      + (mchips.length?'<div class="c-metrics">'+mchips.join("")+'</div>':'')
+      + '</div>';
+  }
+
+  function renderList(arr){
+    var el = $("view-list");
+    if(!arr.length){ el.innerHTML = '<div class="no-data">当前筛选条件下没有政策。可放宽状态筛选（已废止/被替代默认隐藏）。</div>'; return; }
+    var hiddenIdx = state.statuses.length && state.statuses.indexOf("历史索引")<0
+      ? DATA.filter(function(d){ return d.tier==="index"; }).length : 0;
+    var hint = hiddenIdx
+      ? '<div class="idx-hint">另有 <b>'+hiddenIdx+'</b> 条 2025 年前的历史索引未显示——这些条目只记录标题、日期、发文层级与链接，用于追溯制度沿革，不含经济性提炼。'
+        + '<a href="javascript:void(0)" id="show-idx">展开查看</a></div>'
+      : '';
+    el.innerHTML = hint + arr.map(cardHtml).join("");
+    Array.prototype.forEach.call(el.querySelectorAll(".card"), function(c){
+      c.onclick = function(){ openDetail(c.getAttribute("data-id")); };
+    });
+    var sx = $("show-idx");
+    if(sx) sx.onclick = function(){
+      state.statuses.push("历史索引");
+      buildFilters(); render();
+    };
+  }
+
+  /* ---------- render matrix ---------- */
+  function renderMatrix(arr){
+    var el = $("view-matrix");
+    var regions = arr.map(function(d){return d.region;})
+      .filter(function(v,i,a){return a.indexOf(v)===i;})
+      .sort(function(a,b){return regionRank(a)-regionRank(b);});
+    if(!regions.length){ el.innerHTML = '<div class="no-data">无数据。</div>'; return; }
+    var cats = CATS;
+    var cell = {};
+    arr.forEach(function(d){
+      cell[d.region+"|"+d.category] = (cell[d.region+"|"+d.category]||0)+1;
+    });
+    var max = 1;
+    Object.keys(cell).forEach(function(k){ if(cell[k]>max) max = cell[k]; });
+    function bg(n){
+      var t = n/max;
+      if(t>0.66) return "background:#BFDCCB;color:#14432E";
+      if(t>0.33) return "background:#DCEBE2;color:#1D5A40";
+      return "background:#EFF6F1;color:#3E6B55";
+    }
+    var head = "<tr><th class='rh'>地区</th>" + cats.map(function(c){
+      return "<th>"+esc(c.replace("政策","").replace("规则","").replace("市场",""))+"</th>";
+    }).join("") + "<th style='color:#A8842C'>合计</th></tr>";
+
+    var rows = regions.map(function(r){
+      var total = 0;
+      var tds = cats.map(function(c){
+        var n = cell[r+"|"+c] || 0;
+        total += n;
+        if(!n) return "<td class='z'>·</td>";
+        return '<td style="'+bg(n)+'" data-r="'+esc(r)+'" data-c="'+esc(c)+'">'+n+"</td>";
+      }).join("");
+      return "<tr><th class='rh'>"+esc(r)+"</th>"+tds
+        + '<td style="color:#A8842C;font-weight:600">'+total+"</td></tr>";
+    }).join("");
+
+    var colTotals = cats.map(function(c){
+      var n = 0;
+      arr.forEach(function(d){ if(d.category===c) n++; });
+      return n;
+    });
+    var foot = "<tr><th class='rh' style='color:#8C8A80'>合计</th>"
+      + colTotals.map(function(n){ return '<td style="color:#8C8A80;background:#FAFAF7">'+(n||"·")+"</td>"; }).join("")
+      + '<td style="color:#8C8A80;background:#FAFAF7">'+arr.length+"</td></tr>";
+
+    el.innerHTML = '<div class="mx-wrap"><table class="mx">'+head+rows+foot+"</table>"
+      + '<div class="mx-note">格内为政策条数，颜色越深表示该省该类别政策越密。<b>空白格本身是信号</b>——'
+      + "某省某类别长期无政策，说明该省尚未建立对应机制，项目收益假设缺乏政策依据。点击任意非空格可下钻到该省该类别的政策列表。</div></div>";
+
+    Array.prototype.forEach.call(el.querySelectorAll("td[data-r]"), function(td){
+      td.onclick = function(){
+        state.regions = [td.getAttribute("data-r")];
+        state.cats = [td.getAttribute("data-c")];
+        state.statuses = ["现行有效","征求意见","已废止","被替代","已失效"];
+        setView("list");
+        buildFilters();
+        render();
+      };
+    });
+  }
+
+  /* ---------- render timeline ---------- */
+  var CAT_COLOR = ["#1D7E5A","#2F5C8A","#A8842C","#7D5A9B","#B3352B","#5C6B7A",
+                   "#3E8E7E","#8A6A2F","#9B5C6B","#4A6B4A"];
+
+  function renderTimeline(arr){
+    var el = $("view-timeline");
+    if(!arr.length){ el.innerHTML = '<div class="no-data">无数据。</div>'; return; }
+    var byMonth = {};
+    arr.forEach(function(d){
+      var m = d.publish_date.slice(0,7);
+      (byMonth[m] = byMonth[m] || []).push(d);
+    });
+    var months = Object.keys(byMonth).sort().reverse();
+    var html = months.map(function(m){
+      var items = sortIt(byMonth[m]);
+      var catCnt = {};
+      items.forEach(function(d){ catCnt[d.category] = (catCnt[d.category]||0)+1; });
+      var bar = CATS.map(function(c,i){
+        var n = catCnt[c]||0;
+        if(!n) return "";
+        var w = (n/items.length*100).toFixed(1);
+        return '<i style="width:'+w+'%;background:'+CAT_COLOR[i%CAT_COLOR.length]+'" title="'+esc(c)+" "+n+'"></i>';
+      }).join("");
+      var rows = items.map(function(d){
+        return '<div class="tl-row" data-id="'+esc(d.id)+'">'
+          + '<span class="tl-d">'+esc(d.publish_date.slice(5))+'</span>'
+          + '<span class="tl-t">'+esc(d.title)+'</span></div>';
+      }).join("");
+      return '<div class="tl-month"><div class="tl-hd"><span class="tl-dot"></span>'
+        + '<span class="tl-m">'+m.replace("-"," 年 ")+" 月</span>"
+        + '<span class="tl-n">'+items.length+" 条</span>"
+        + '<span class="tl-bar">'+bar+"</span></div>"
+        + '<div class="tl-items">'+rows+"</div></div>";
+    }).join("");
+    el.innerHTML = html;
+    Array.prototype.forEach.call(el.querySelectorAll(".tl-row"), function(r){
+      r.onclick = function(){ openDetail(r.getAttribute("data-id")); };
+    });
+  }
+
+  /* ---------- detail ---------- */
+  function openDetail(id){
+    var d = null;
+    for(var i=0;i<DATA.length;i++){ if(DATA[i].id===id){ d = DATA[i]; break; } }
+    if(!d) return;
+    var impCls = d.impact==="利多"?"t-bull":(d.impact==="利空"?"t-bear":"t-flat");
+    var units = {
+      cap_price:["容量补偿/容量电价","元/kW·年"],
+      pv_spread:["峰谷/现货价差","元/kWh"],
+      storage_ratio:["配储比例","%"],
+      duration_h:["时长要求","h"],
+      dispatch:["调用次数","次/日"],
+      scale_gw:["装机规模","GW"],
+      scale_gwh:["装机规模","GWh"],
+      ancillary:["辅助服务补偿","元/MW"]
+    };
+    var ms = d.metrics || {};
+    var mt = Object.keys(units).filter(function(k){
+      return ms[k]!==null && ms[k]!==undefined && ms[k]!=="";
+    }).map(function(k){
+      return "<tr><td>"+units[k][0]+"</td><td>"+ms[k]+" "+units[k][1]+"</td></tr>";
+    }).join("");
+    if(ms.note) mt += '<tr><td>口径备注</td><td style="text-align:left;font-weight:400">'+esc(ms.note)+"</td></tr>";
+
+    var links = [];
+    if(d.source_url) links.push('<a class="link" href="'+esc(d.source_url)+'" target="_blank">原始发文页</a>');
+    if(d.bjx_url) links.push('<a class="link" href="'+esc(d.bjx_url)+'" target="_blank">北极星报道</a>');
+
+    $("drawer").innerHTML = '<button class="d-close" onclick="closeDrawer()">×</button>'
+      + '<div class="d-title">'+esc(d.title)+'</div>'
+      + '<div class="tags" style="margin-top:12px">'
+      + '<span class="tag t-region">'+esc(d.region)+'</span>'
+      + '<span class="tag t-cat">'+esc(d.category)+'</span>'
+      + '<span class="tag t-level">'+esc(d.level)+'</span>'
+      + '<span class="tag '+impCls+'">'+esc(d.impact)+'</span>'
+      + '<span class="tag t-star">'+starStr(d.star)+'</span>'
+      + (d.status!=="现行有效"?'<span class="tag t-flag2">'+esc(d.status)+'</span>':'')
+      + '</div>'
+      + '<div class="d-sec"><h4>基本信息</h4><dl class="kv">'
+      + '<dt>发文单位</dt><dd>'+esc(d.issuer)+'</dd>'
+      + '<dt>发文字号</dt><dd>'+esc(d.doc_no||"—")+'</dd>'
+      + '<dt>文件类型</dt><dd>'+esc(d.doc_type)+'</dd>'
+      + '<dt>发文日期</dt><dd>'+esc(d.publish_date)+'</dd>'
+      + '<dt>生效日期</dt><dd>'+esc(d.effective_date||"待核实")+'</dd>'
+      + '<dt>政策状态</dt><dd>'+esc(d.status)+'</dd>'
+      + (d.superseded_by?'<dt>替代关系</dt><dd>'+esc(d.superseded_by)+'</dd>':'')
+      + '<dt>辅助标签</dt><dd>'+esc((d.sub_tags||[]).join(" · ")||"—")+'</dd>'
+      + '</dl></div>'
+      + '<div class="d-sec"><h4>一句话结论</h4><div style="font-size:13.5px;font-weight:500;line-height:1.7">'+esc(d.summary)+'</div></div>'
+      + '<div class="d-sec"><h4>要点提炼</h4><ol class="d-points">'
+      + (d.key_points||[]).map(function(p){return "<li>"+esc(p)+"</li>";}).join("")
+      + '</ol></div>'
+      + (mt?'<div class="d-sec"><h4>量化指标</h4><table class="mt">'+mt+'</table></div>':'')
+      + '<div class="d-sec"><h4>经济性传导逻辑</h4><div class="logic">'+esc(d.logic)+'</div></div>'
+      + '<div class="d-sec"><h4>建模影响</h4><div style="font-size:12.5px">'
+      + (d.model_flag && d.model_flag!=="无"
+          ? '需更新<b>「'+esc(d.model_flag)+'」</b>相关假设'
+          : "不涉及测算假设调整")
+      + '</div></div>'
+      + '<div class="d-sec"><h4>全文链接</h4>'+(links.join("")||'<span style="color:#8C8A80;font-size:12px">待补</span>')
+      + '</div>'
+      + (d.note?'<div class="d-sec"><h4>备注与缺口</h4><div class="d-note">'+esc(d.note)+'</div></div>':'')
+      + '<div class="d-sec"><h4>元数据</h4><dl class="kv">'
+      + '<dt>编号</dt><dd>'+esc(d.id)+'</dd>'
+      + '<dt>数据层级</dt><dd>'+esc(d.tier==="index"?"索引级（仅标题/单位/日期/状态）":"全字段")+'</dd>'
+      + '<dt>首次入库</dt><dd>'+esc(d.first_seen)+'</dd>'
+      + '<dt>最近复核</dt><dd>'+esc(d.last_checked)+'</dd>'
+      + '</dl></div>';
+    $("drawer").classList.add("on");
+    $("mask").classList.add("on");
+  }
+  window.closeDrawer = function(){
+    $("drawer").classList.remove("on");
+    $("mask").classList.remove("on");
+  };
+  $("mask").onclick = window.closeDrawer;
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape") window.closeDrawer(); });
+
+  /* ---------- view switch ---------- */
+  function setView(v){
+    state.view = v;
+    Array.prototype.forEach.call(document.querySelectorAll(".views button"), function(b){
+      b.className = b.getAttribute("data-view")===v ? "on" : "";
+    });
+    $("view-list").style.display = v==="list"?"":"none";
+    $("view-matrix").style.display = v==="matrix"?"":"none";
+    $("view-timeline").style.display = v==="timeline"?"":"none";
+  }
+
+  /* ---------- main render ---------- */
+  function render(){
+    var arr = sortIt(DATA.filter(match));
+    $("hit").innerHTML = "命中 <b>"+arr.length+"</b> 条"
+      + (arr.length!==DATA.length ? "（共 "+DATA.length+" 条）" : "")
+      + "　·　利多 "+arr.filter(function(d){return d.impact==="利多";}).length
+      + " / 利空 "+arr.filter(function(d){return d.impact==="利空";}).length
+      + " / 中性 "+arr.filter(function(d){return d.impact==="中性";}).length;
+    if(state.view==="list") renderList(arr);
+    else if(state.view==="matrix") renderMatrix(arr);
+    else renderTimeline(arr);
+  }
+
+  /* ---------- bind ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".views button"), function(b){
+    b.onclick = function(){ setView(b.getAttribute("data-view")); render(); };
+  });
+  $("sort").onchange = function(){ state.sort = this.value; render(); };
+  $("f-star").onchange = function(){ state.minStar = parseInt(this.value,10)||0; render(); };
+  $("f-from").onchange = function(){ state.from = this.value; render(); };
+  $("f-to").onchange = function(){ state.to = this.value; render(); };
+  var qt = null;
+  $("f-q").oninput = function(){
+    var v = this.value;
+    clearTimeout(qt);
+    qt = setTimeout(function(){ state.q = v.trim(); render(); }, 180);
+  };
+  $("btn-reset").onclick = function(){
+    state.regions=[]; state.cats=[]; state.levels=[]; state.impacts=[];
+    state.statuses=["现行有效","征求意见"]; state.minStar=0; state.q=""; state.from=""; state.to="";
+    $("f-star").value="0"; $("f-from").value=""; $("f-to").value=""; $("f-q").value="";
+    $("sort").value="date"; state.sort="date";
+    buildFilters(); render();
+  };
+
+  /* ---------- init ---------- */
+  if(!DATA.length){
+    document.getElementById("view-list").innerHTML =
+      '<div class="no-data">未读取到数据。请先运行 <code>python tools/build_data.py</code> 生成 data/data-bundle.js。</div>';
+  } else {
+    renderMetrics();
+    buildFilters();
+    render();
+  }
+})();
+</script>
+</body>
+</html>
