@@ -19,3 +19,6 @@ _*.txt
 Thumbs.db
 __pycache__/
 *.pyc
+
+# 研究底稿与临时产出（不入公开仓库）
+outputs/

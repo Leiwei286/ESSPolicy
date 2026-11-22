@@ -79,7 +79,9 @@ for p in full:
     ed = p.get("effective_date")
     if ed and DATE_RE.match(str(ed)):
         if ed < p["publish_date"]:
-            key = "追溯执行(已注明)" if "追溯" in str(p.get("note") or "") else "生效日早于发布日(未注明)"
+            _n = str(p.get("note") or "")
+            _ok = ("追溯" in _n) or ("报道日" in _n)
+            key = "日期差异已注明" if _ok else "生效日早于发布日(未注明)"
             issues[key].append(f"{p['id']} {p['publish_date']} → {ed}")
 
 # 5. 替代关系闭环
